@@ -55,6 +55,11 @@ class CalendarViewModel(
         }
     }
 
+    fun setMonthYear(month: Int, year: Int) {
+        _uiState.value = _uiState.value.copy(currentMonth = month, currentYear = year)
+        loadMonth()
+    }
+
     fun selectDate(date: String) {
         _uiState.value = _uiState.value.copy(selectedDate = date)
         viewModelScope.launch {

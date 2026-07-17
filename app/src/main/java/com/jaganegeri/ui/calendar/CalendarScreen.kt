@@ -46,14 +46,8 @@ fun CalendarScreen(
     onCaseClick: (String) -> Unit  // case id
 ) {
     val viewModel = remember { CalendarViewModel(userId, caseRepository) }
-    viewModel.let { vm ->
-        LaunchedEffect(initialMonth, initialYear) {
-            vm._uiState.value = vm._uiState.value.copy(
-                currentMonth = initialMonth,
-                currentYear = initialYear
-            )
-            vm.loadMonth()
-        }
+    LaunchedEffect(initialMonth, initialYear) {
+        viewModel.setMonthYear(initialMonth, initialYear)
     }
 
     val uiState by viewModel.uiState.collectAsState()
