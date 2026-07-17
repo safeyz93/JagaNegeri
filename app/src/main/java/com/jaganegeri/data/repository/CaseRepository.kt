@@ -127,20 +127,13 @@ class CaseRepository(private val supabase: SupabaseClient) {
     suspend fun searchCases(query: String): List<CorruptionCase> {
         return withContext(Dispatchers.IO) {
             try {
-                supabase.postgrest["corruption_cases"].select(Columns.raw("*")) {
-                    filter { textSearch("nama_koruptor", query.trim()) }
+                // Ambil semua kasus lalu filter manual (kompatibel semua versi SDK)
+                val all = supabase.postgrest["corruption_cases"].select(Columns.raw("*")) {
                     order("tanggal_pengumuman", order = io.github.jan.supabase.postgrest.query.Order.DESCENDING)
                 }.decodeList<CorruptionCase>()
+                all.filter { it.namaKoruptor.contains(query.trim(), ignoreCase = true) }
             } catch (e: Exception) {
-                // Fallback: ambil semua lalu filter manual
-                try {
-                    val all = supabase.postgrest["corruption_cases"].select(Columns.raw("*")) {
-                        order("tanggal_pengumuman", order = io.github.jan.supabase.postgrest.query.Order.DESCENDING)
-                    }.decodeList<CorruptionCase>()
-                    all.filter { it.namaKoruptor.contains(query.trim(), ignoreCase = true) }
-                } catch (e2: Exception) {
-                    emptyList()
-                }
+                emptyList()
             }
         }
     }
