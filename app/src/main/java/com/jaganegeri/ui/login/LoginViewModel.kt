@@ -13,7 +13,8 @@ data class LoginUiState(
     val error: String? = null,
     val isLoggedIn: Boolean = false,
     val profile: Profile? = null,
-    val showRegister: Boolean = false
+    val showRegister: Boolean = false,
+    val registerSuccess: Boolean = false
 )
 
 class LoginViewModel(
@@ -42,7 +43,7 @@ class LoginViewModel(
                 onFailure = { e ->
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        error = "Login gagal: ${e.message ?: "Username/password salah"}"
+                        error = "Username atau password salah"
                     )
                 }
             )
@@ -80,13 +81,14 @@ class LoginViewModel(
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         showRegister = false,
-                        error = null
+                        error = null,
+                        registerSuccess = true
                     )
                 },
                 onFailure = { e ->
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        error = "Pendaftaran gagal: ${e.message ?: "Coba lagi"}"
+                        error = "Registrasi gagal, coba lagi"
                     )
                 }
             )

@@ -3,10 +3,17 @@ package com.jaganegeri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,9 +34,11 @@ import com.jaganegeri.ui.navigation.Screen
 import com.jaganegeri.ui.profile.ProfileScreen
 import com.jaganegeri.ui.riwayat.RiwayatScreen
 import com.jaganegeri.ui.theme.JagaNegeriTheme
+import com.jaganegeri.ui.theme.Red700
 import com.jaganegeri.ui.validation.ValidationQueueScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -43,8 +52,50 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             JagaNegeriTheme {
-                JagaNegeriNavHost(authRepository, caseRepository, validationRepository)
+                var showSplash by remember { mutableStateOf(true) }
+
+                LaunchedEffect(Unit) {
+                    delay(2000)
+                    showSplash = false
+                }
+
+                if (showSplash) {
+            SplashScreen()
+                } else {
+                    JagaNegeriNavHost(authRepository, caseRepository, validationRepository)
+                }
             }
+        }
+    }
+}
+
+@Composable
+fun SplashScreen() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Image(
+                painter = painterResource(id = com.jaganegeri.R.mipmap.ic_launcher),
+                contentDescription = "Logo JagaNegeri",
+                modifier = Modifier.size(96.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "JAGA NEGERI",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = Red700
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "Pantau & Catat Kasus Korupsi Indonesia",
+                fontSize = 13.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
@@ -64,7 +115,7 @@ fun JagaNegeriNavHost(
         loggedInProfile?.let { HomeViewModel(it.id, caseRepository) }
     }
 
-    val logout = {
+    val logout: () -> Unit = {
         CoroutineScope(Dispatchers.IO).launch {
             authRepository.logout()
             navController.navigate(Screen.Login.route) {

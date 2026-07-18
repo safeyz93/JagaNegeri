@@ -22,10 +22,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jaganegeri.data.model.CorruptionCase
+import com.jaganegeri.data.repository.DateDetail
 import com.jaganegeri.ui.theme.Red700
 import com.jaganegeri.ui.theme.Red50
 import com.jaganegeri.ui.theme.Orange700
 import com.jaganegeri.ui.theme.Green700
+import com.jaganegeri.ui.theme.Green50
 import java.util.Calendar
 
 private val dayHeaders = listOf("Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab")
@@ -162,6 +164,7 @@ fun CalendarScreen(
                         val isSelected = dateStr == uiState.selectedDate
                         val isToday = dateStr == today
                         val hasEvent = uiState.datesWithEvents.contains(dateStr)
+                        val detail = uiState.dateDetails[dateStr]
 
                         Box(
                             modifier = Modifier
@@ -185,12 +188,26 @@ fun CalendarScreen(
                                         else -> MaterialTheme.colorScheme.onSurface
                                     }
                                 )
-                                if (hasEvent) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(5.dp)
-                                            .background(Orange700, MaterialTheme.shapes.extraSmall)
-                                    )
+                                if (detail != null) {
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(2.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        if (detail.terverifikasi > 0) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(5.dp)
+                                                    .background(Green700, MaterialTheme.shapes.extraSmall)
+                                            )
+                                        }
+                                        if (detail.menunggu > 0) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(5.dp)
+                                                    .background(Orange700, MaterialTheme.shapes.extraSmall)
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -207,6 +224,28 @@ fun CalendarScreen(
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
+
+            // === Detail verifikasi tanggal terpilih ===
+            val selectedDetail = uiState.dateDetails[uiState.selectedDate]
+            if (selectedDetail != null) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 2.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = "✅ Terverifikasi: ${selectedDetail.terverifikasi}",
+                        fontSize = 13.sp,
+                        color = Green700,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "⏳ Menunggu: ${selectedDetail.menunggu}",
+                        fontSize = 13.sp,
+                        color = Orange700,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(4.dp))
 

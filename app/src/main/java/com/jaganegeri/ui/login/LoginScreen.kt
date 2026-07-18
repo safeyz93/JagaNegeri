@@ -78,7 +78,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Bridging Scripture & Code",
+                text = "Pantau & Catat Kasus Korupsi Indonesia",
                 fontSize = 11.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
             )
@@ -97,6 +97,24 @@ fun LoginScreen(
                         text = uiState.error!!,
                         modifier = Modifier.padding(12.dp),
                         color = MaterialTheme.colorScheme.onErrorContainer,
+                        fontSize = 13.sp
+                    )
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+
+            // Register success message
+            if (uiState.registerSuccess) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                    )
+                ) {
+                    Text(
+                        text = "✅ Akun berhasil dibuat! Silakan login.",
+                        modifier = Modifier.padding(12.dp),
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                         fontSize = 13.sp
                     )
                 }

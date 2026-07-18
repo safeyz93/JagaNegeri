@@ -12,13 +12,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jaganegeri.data.model.CorruptionCase
 import com.jaganegeri.data.repository.CaseRepository
 import com.jaganegeri.ui.theme.Green700
 import com.jaganegeri.ui.theme.Orange700
-import com.jaganegeri.ui.theme.Red700
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,6 +30,7 @@ fun RiwayatScreen(
     val viewModel = remember { RiwayatViewModel(caseRepository) }
     val uiState by viewModel.uiState.collectAsState()
     var searchText by remember { mutableStateOf("") }
+    var wilayahText by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -54,7 +55,7 @@ fun RiwayatScreen(
                 .padding(padding)
                 .padding(16.dp)
         ) {
-            // Search bar
+            // Search bar - nama
             OutlinedTextField(
                 value = searchText,
                 onValueChange = { searchText = it },
@@ -62,15 +63,29 @@ fun RiwayatScreen(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 trailingIcon = {
-                    IconButton(onClick = { viewModel.search(searchText) }) {
+                    IconButton(onClick = { viewModel.search(searchText, wilayahText) }) {
                         Icon(Icons.Default.Search, contentDescription = "Cari")
                     }
                 },
                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                    imeAction = androidx.compose.ui.text.input.ImeAction.Next
+                )
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Search bar - wilayah
+            OutlinedTextField(
+                value = wilayahText,
+                onValueChange = { wilayahText = it },
+                label = { Text("Cari berdasarkan wilayah...") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                     imeAction = androidx.compose.ui.text.input.ImeAction.Search
                 ),
                 keyboardActions = androidx.compose.foundation.text.KeyboardActions(
-                    onSearch = { viewModel.search(searchText) }
+                    onSearch = { viewModel.search(searchText, wilayahText) }
                 )
             )
 
@@ -78,9 +93,9 @@ fun RiwayatScreen(
 
             // Tombol cari
             Button(
-                onClick = { viewModel.search(searchText) },
+                onClick = { viewModel.search(searchText, wilayahText) },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = searchText.isNotBlank() && !uiState.isLoading
+                enabled = (searchText.isNotBlank() || wilayahText.isNotBlank()) && !uiState.isLoading
             ) {
                 if (uiState.isLoading) {
                     CircularProgressIndicator(
@@ -113,8 +128,8 @@ fun RiwayatScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "🔍\nKetik nama koruptor\nuntuk mencari riwayat",
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        text = "Cari berdasarkan nama koruptor\natau wilayah untuk melihat riwayat",
+                        textAlign = TextAlign.Center,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 15.sp
                     )
@@ -187,9 +202,9 @@ private fun RiwayatCaseCard(case: CorruptionCase, onClick: () -> Unit) {
                 ) {
                     Text(
                         text = when (case.statusVerifikasi) {
-                            "terverifikasi" -> "✅ Terverifikasi"
+                            "terverifikasi" -> "Terverifikasi"
                             "ditolak" -> "Ditolak"
-                            else -> "⏳ Menunggu"
+                            else -> "Menunggu"
                         },
                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                         color = statusColor,

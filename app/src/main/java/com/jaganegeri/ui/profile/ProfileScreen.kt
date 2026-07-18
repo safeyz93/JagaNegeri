@@ -84,13 +84,58 @@ fun ProfileScreen(
                         )
                     }
                 }
+                val displayName = if (username.contains("@")) username.substringBefore("@") else username
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "@$username",
+                    text = displayName,
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // === Validasi Data Masuk (pindah ke atas) ===
+                OutlinedCard(
+                    onClick = onValidationQueueClick,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "Validasi Data Masuk",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp
+                            )
+                            Text(
+                                text = "${uiState.queueCount} data menunggu",
+                                fontSize = 13.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        if (uiState.queueCount > 0) {
+                            Badge(
+                                containerColor = Red700,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            ) {
+                                Text("${uiState.queueCount}")
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                        }
+                        Icon(
+                            Icons.Default.ChevronRight,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -148,48 +193,6 @@ fun ProfileScreen(
                     value = "${uiState.tolakVote}",
                     color = MaterialTheme.colorScheme.error
                 )
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                // === Tombol Validasi Queue ===
-                OutlinedCard(
-                    onClick = onValidationQueueClick,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "Validasi Data Masuk",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 15.sp
-                            )
-                            Text(
-                                text = "${uiState.queueCount} data menunggu",
-                                fontSize = 13.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        if (uiState.queueCount > 0) {
-                            Badge(
-                                containerColor = Red700,
-                                contentColor = MaterialTheme.colorScheme.onPrimary
-                            ) {
-                                Text("${uiState.queueCount}")
-                            }
-                            Spacer(modifier = Modifier.width(8.dp))
-                        }
-                        Icon(
-                            Icons.Default.ChevronRight,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
 
                 Spacer(modifier = Modifier.height(24.dp))
 

@@ -2,7 +2,6 @@ package com.jaganegeri.data.repository
 
 import com.jaganegeri.data.model.Profile
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.postgrest.postgrest
@@ -16,16 +15,12 @@ class AuthRepository(private val supabase: SupabaseClient) {
      * Register user baru via Supabase Auth
      * Trigger handle_new_user() akan otomatis buat profile
      */
-    suspend fun register(username: String, password: String): Result<Unit> {
+    suspend fun register(username: String, passwordInput: String): Result<Unit> {
         return withContext(Dispatchers.IO) {
             try {
                 supabase.auth.signUpWith(Email) {
-                    email = "$username@jaganegeri.app"  // dummy email, pakai username sebagai identifier
-                    password = password
-                    data = buildMap {
-                        put("username", username)
-                        put("display_name", username)
-                    }
+                    email = "$username@jaganegeri.app"
+                    password = passwordInput
                 }
                 Result.success(Unit)
             } catch (e: Exception) {
@@ -37,13 +32,12 @@ class AuthRepository(private val supabase: SupabaseClient) {
     /**
      * Login user
      */
-    suspend fun login(username: String, password: String): Result<Profile> {
+    suspend fun login(username: String, passwordInput: String): Result<Profile> {
         return withContext(Dispatchers.IO) {
             try {
-                val email = "$username@jaganegeri.app"
                 supabase.auth.signInWith(Email) {
-                    this.email = email
-                    this.password = password
+                    email = "$username@jaganegeri.app"
+                    password = passwordInput
                 }
                 // Ambil profile dari tabel profiles
                 val userId = supabase.auth.currentUserOrNull()?.id ?: throw Exception("Login gagal")
@@ -57,19 +51,7 @@ class AuthRepository(private val supabase: SupabaseClient) {
         }
     }
 
-    /**
-     * Cek apakah user sudah login (session masih valid)
-     */
-    suspend fun getCurrentSession(): Profile? {
-        return try {
-            val userId = supabase.auth.currentUserOrNull()?.id ?: return null
-            supabase.postgrest["profiles"].select(Columns.raw("*")) {
-                filter { eq("id", userId) }
-            }.decodeSingle<Profile>()
-        } catch (e: Exception) {
-            null
-        }
-    }
+
 
     /**
      * Logout
@@ -90,7 +72,7 @@ class AuthRepository(private val supabase: SupabaseClient) {
                     filter { eq("username", username) }
                 }.decodeList<Map<String, String>>()
                 result.isNotEmpty()
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 false
             }
         }

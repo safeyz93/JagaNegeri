@@ -17,10 +17,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.Color
 import com.jaganegeri.ui.theme.Red700
 import com.jaganegeri.ui.theme.Red50
 import com.jaganegeri.ui.theme.Green700
 import com.jaganegeri.ui.theme.Green50
+import com.jaganegeri.ui.theme.Orange700
 
 data class MonthData(
     val index: Int,       // 0-11
@@ -86,8 +88,9 @@ fun HomeScreen(
                 .padding(16.dp)
         ) {
             // Greeting
+            val displayName = if (username.contains("@")) username.substringBefore("@") else username
             Text(
-                text = "Halo, $username 👋",
+                text = "Halo, $displayName 👋",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -132,17 +135,28 @@ fun HomeScreen(
 
 @Composable
 private fun MonthCard(month: MonthData, onClick: () -> Unit) {
-    val hasData = month.count > 0
+    val bgColor = when {
+        month.count == 0 -> MaterialTheme.colorScheme.surfaceVariant
+        month.count <= 5 -> Green50
+        month.count <= 10 -> Color(0xFFFFF8E1)  // kuning samar
+        else -> Red50
+    }
+    val tintColor = when {
+        month.count == 0 -> MaterialTheme.colorScheme.onSurfaceVariant
+        month.count <= 5 -> Green700
+        month.count <= 10 -> Orange700
+        else -> Red700
+    }
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(1f)
             .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
-            containerColor = if (hasData) Red50 else MaterialTheme.colorScheme.surfaceVariant
+            containerColor = bgColor
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = if (hasData) 4.dp else 1.dp
+            defaultElevation = if (month.count > 0) 4.dp else 1.dp
         )
     ) {
         Column(
@@ -156,13 +170,13 @@ private fun MonthCard(month: MonthData, onClick: () -> Unit) {
                 text = month.name,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (hasData) Red700 else MaterialTheme.colorScheme.onSurfaceVariant
+                color = tintColor
             )
-            if (hasData) {
+            if (month.count > 0) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Card(
                     colors = CardDefaults.cardColors(
-                        containerColor = if (hasData) Red700 else Green700
+                        containerColor = tintColor
                     )
                 ) {
                     Text(

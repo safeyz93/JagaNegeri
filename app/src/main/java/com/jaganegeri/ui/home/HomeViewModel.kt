@@ -28,7 +28,8 @@ class HomeViewModel(
     fun loadData() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
-            val perMonth = caseRepository.getCasesPerMonth(userId)
+            // Ambil semua data terverifikasi tanpa filter userId
+            val perMonth = caseRepository.getCasesPerMonth(null)
             _uiState.value = _uiState.value.copy(
                 isLoading = false,
                 casesPerMonth = perMonth

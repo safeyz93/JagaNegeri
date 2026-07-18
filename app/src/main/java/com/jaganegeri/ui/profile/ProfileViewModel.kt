@@ -38,7 +38,7 @@ class ProfileViewModel(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
             try {
-                val allCases = caseRepository.getAllCases(userId)
+                val allCases = caseRepository.getAllCases(null)  // semua kasus global
                 val queue = validationRepository.getValidationQueue(userId)
                 val myVotes = validationRepository.getMyVotes(userId)
 

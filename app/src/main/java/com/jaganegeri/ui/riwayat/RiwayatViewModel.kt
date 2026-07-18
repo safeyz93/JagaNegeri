@@ -24,12 +24,12 @@ class RiwayatViewModel(
     private val _uiState = MutableStateFlow(RiwayatUiState())
     val uiState: StateFlow<RiwayatUiState> = _uiState
 
-    fun search(query: String) {
-        if (query.isBlank()) return
+    fun search(query: String, wilayah: String = "") {
+        if (query.isBlank() && wilayah.isBlank()) return
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, query = query, hasSearched = true)
             try {
-                val results = caseRepository.searchCases(query.trim())
+                val results = caseRepository.searchCases(query.trim(), wilayah.trim())
 
                 // Group by nama koruptor
                 val grouped = results.groupBy { it.namaKoruptor }
